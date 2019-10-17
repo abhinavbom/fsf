@@ -105,7 +105,7 @@ Retrieve latest version of master.
 
 ```
 cd ~
-wget https://github.com/EmersonElectricCo/fsf/archive/master.zip
+wget https://github.com/abhinavbom/fsf.git
 unzip master.zip
 vim fsf-master/fsf-server/conf/config.py
 ```
