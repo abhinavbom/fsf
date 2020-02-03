@@ -37,8 +37,7 @@ triggers = [('ft_zip', ['EXTRACT_ZIP'], False),
             ('ft_elf', ['META_ELF'], False),
             ('ft_java_class', ['META_JAVA_CLASS'], False),
             ('misc_hexascii_pe_in_html', ['EXTRACT_HEXASCII_PE'], False),
-            ('misc_no_dosmode_header', '', False),
-            ('ft_macho', ['META_MACHO'], False),
+            ('misc_no_dosmode_header', '', False)
      ]
 
 # STRUCTURE: List of tuples such that...

@@ -134,8 +134,6 @@ RUN pip install czipfile \
   pyelftools \
   javatools \
   requests \
-  git+https://github.com/aaronst/macholibre.git && \
-
   BUILD_LIB=1 pip install ssdeep
 
 # Add nonroot user, clone repo and setup environment
@@ -148,7 +146,7 @@ RUN groupadd -r nonroot && \
 USER nonroot
 RUN mkdir -pv /home/nonroot/workdir && \
   cd /home/nonroot && \
-  git clone https://github.com/EmersonElectricCo/fsf.git && \
+  git clone https://github.com/abhinavbom/fsf.git && \
   cd fsf/ && \
   sed -i 's/\/FULL\/PATH\/TO/\/home\/nonroot/' fsf-server/conf/config.py && \
   sed -i "/^SCANNER\_CONFIG/ s/\/tmp/\/home\/nonroot\/workdir/" fsf-server/conf/config.py 
