@@ -36,9 +36,9 @@ Installing Yara
 
 Make sure you are getting the latest and greatest version of Yara...
 ```
-wget https://github.com/plusvic/yara/archive/v3.4.0.tar.gz
-tar -xvzf v3.4.0.tar.gz
-cd yara-3.4.0/
+wget https://github.com/VirusTotal/yara/archive/v3.11.0.tar.gz
+tar -xvf v3.11.0.tar.gz
+cd yara-3.11.0/
 ./bootstrap.sh
 ./configure
 make
