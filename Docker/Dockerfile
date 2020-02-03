@@ -29,7 +29,7 @@
 #
 
 FROM ubuntu:16.04
-MAINTAINER Zod (@wzod)
+MAINTAINER abhinavbom
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -133,7 +133,7 @@ RUN pip install czipfile \
   pyasn1 \
   pyelftools \
   javatools \
-  requests \
+  requests && \
   BUILD_LIB=1 pip install ssdeep
 
 # Add nonroot user, clone repo and setup environment
