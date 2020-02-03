@@ -29,7 +29,7 @@
 #
 
 FROM ubuntu:16.04
-MAINTAINER Zod (@wzod)
+MAINTAINER @abhinavbom
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -80,24 +80,20 @@ RUN cd /tmp && \
   make install && \
   cd /tmp && \
 
-# Retrieve yara-python from the project's site using recursive option and install yara-python
+# Yara-python
   git clone --recursive https://github.com/VirusTotal/yara-python && \
   cd yara-python/ && \
   python setup.py build && \
   python setup.py install && \
   cd /tmp && \
 
-# Retrieve current version of pefile via wget, verify known good hash and install pefile
-  wget -O pefile-1.2.10-139.tar.gz "https://github.com/erocarrera/pefile/archive/pefile-1.2.10-139.tar.gz" && \
-  echo 3297cb72e6a51befefc3d9b27ec7690b743ee826538629ecf68f4eee64f331ab\ \ pefile-1.2.10-139.tar.gz > sha256sum-pefile && \
-  sha256sum -c sha256sum-pefile && \
-
-  tar vxzf pefile-1.2.10-139.tar.gz && \
-  cd pefile-pefile-1.2.10-139/ && \
-  sed -i s/1\.2\.10.*/1\.2\.10\.139\'/ pefile.py && \
+# Pefile
+  https://github.com/erocarrera/pefile.git
+  cd pefile/ && \
   python setup.py build && \
   python setup.py install && \
   cd /tmp && \
+
 
 # Retrieve current version of jq via wget, verify known good hash and move to /usr/local/bin
   wget -O jq "https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64" && \
@@ -138,7 +134,7 @@ RUN groupadd -r nonroot && \
 USER nonroot
 RUN mkdir -pv /home/nonroot/workdir && \
   cd /home/nonroot && \
-  git clone https://github.com/EmersonElectricCo/fsf.git && \
+  git clone https://github.com/abhinavbom/fsf.git && \
   cd fsf/ && \
   sed -i 's/\/FULL\/PATH\/TO/\/home\/nonroot/' fsf-server/conf/config.py && \
   sed -i "/^SCANNER\_CONFIG/ s/\/tmp/\/home\/nonroot\/workdir/" fsf-server/conf/config.py 
@@ -157,4 +153,4 @@ ENV HOME /home/nonroot
 ENV USER nonroot
 WORKDIR /home/nonroot/workdir
 
-ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/127\.0\.0\.1/$(hostname -i)/" /home/nonroot/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /bin/bash
+ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/nonroot/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /bin/bash
