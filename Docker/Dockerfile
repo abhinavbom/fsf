@@ -61,6 +61,8 @@ RUN apt-get update && \
   unzip \
   upx-ucl \
   vim \
+  python-hachoir-regex \
+  python-hachoir-subfile \
   wget && \
 
 # Update setuptools
@@ -83,6 +85,16 @@ RUN cd /tmp && \
 # Retrieve yara-python from the project's site using recursive option and install yara-python
   git clone --recursive https://github.com/VirusTotal/yara-python && \
   cd yara-python/ && \
+  python setup.py build && \
+  python setup.py install && \
+  cd /tmp && \
+
+
+# https://github.com/aaronst/macholibre.git
+
+  git clone https://github.com/aaronst/macholibre.git && \
+  cd macholibre/ && \
+  git checkout python2 && \
   python setup.py build && \
   python setup.py install && \
   cd /tmp && \
@@ -110,9 +122,7 @@ RUN cd /tmp && \
 RUN pip install czipfile \
   hachoir-parser \
   hachoir-core \
-  hachoir-regex \
   hachoir-metadata \
-  hachoir-subfile \
   ConcurrentLogHandler \
   pypdf2 \
   xmltodict \
