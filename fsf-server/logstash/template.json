@@ -1,0 +1,10 @@
+{
+    "template" : "scan_result",
+    "version" : 50001,
+    "settings" : {
+      "index.refresh_interval" : "5s",
+      "dynamic": "false",
+      "index.mapping.total_fields.limit": 6000
+  }
+  }
+  

@@ -1,6 +1,4 @@
-# This Docker image encapsulates the File Scanning Framework (FSF) by 
-# Emerson Electric Company from https://github.com/EmersonElectricCo/fsf 
-#
+# This Docker image encapsulates the File Scanning Framework 
 # To run this image after installing Docker using a standalone instance, use a command like 
 # the following, replacing “~/fsf-workdir" with the path to the location of your FSF
 # working directory:
@@ -63,6 +61,7 @@ RUN apt-get update && \
   vim \
   python-hachoir-regex \
   python-hachoir-subfile \
+  logstash \
   wget && \
 
 # Update setuptools
@@ -165,4 +164,4 @@ ENV HOME /home/nonroot
 ENV USER nonroot
 WORKDIR /home/nonroot/workdir
 
-ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/nonroot/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /bin/bash
+ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/nonroot/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /usr/share/logstash/bin/logstash -f /home/nonroot/fsf/logstash/logstash.conf && /bin/bash
