@@ -61,11 +61,19 @@ RUN apt-get update && \
   vim \
   python-hachoir-regex \
   python-hachoir-subfile \
-  logstash \
+  openjdk-8-jre \
+  openjdk-8-jdk \
   wget && \
 
 # Update setuptools
   pip install --upgrade setuptools
+
+# Logstash installation
+
+RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add -
+RUN apt-get install apt-transport-https
+RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list
+RUN apt-get update && apt-get install logstash
 
 # Retrieve current version of Yara via wget, verify known good hash and install Yara
 RUN cd /tmp && \
@@ -136,32 +144,26 @@ RUN pip install czipfile \
   BUILD_LIB=1 pip install ssdeep
 
 # Add nonroot user, clone repo and setup environment
-RUN groupadd -r nonroot && \
-  useradd -r -g nonroot -d /home/nonroot -s /sbin/nologin -c "Nonroot User" nonroot && \
-  mkdir /home/nonroot && \
-  chown -R nonroot:nonroot /home/nonroot && \
-  echo "/usr/local/lib" >> /etc/ld.so.conf.d/yara.conf
+RUN  echo "/usr/local/lib" >> /etc/ld.so.conf.d/yara.conf
 
-USER nonroot
-RUN mkdir -pv /home/nonroot/workdir && \
-  cd /home/nonroot && \
+USER root
+RUN cd /home/ && \
+  mkdir fsf-logs && \
   git clone https://github.com/abhinavbom/fsf.git && \
   cd fsf/ && \
-  sed -i 's/\/FULL\/PATH\/TO/\/home\/nonroot/' fsf-server/conf/config.py && \
-  sed -i "/^SCANNER\_CONFIG/ s/\/tmp/\/home\/nonroot\/workdir/" fsf-server/conf/config.py 
-  
+
 USER root
 RUN ldconfig && \
-  ln -f -s /home/nonroot/fsf/fsf-server/main.py /usr/local/bin/ && \
-  ln -f -s /home/nonroot/fsf/fsf-client/fsf_client.py /usr/local/bin/ && \
+  ln -f -s /home/fsf/fsf-server/main.py /usr/local/bin/ && \
+  ln -f -s /home/fsf/fsf-client/fsf_client.py /usr/local/bin/ && \
   apt-get remove -y --purge automake build-essential libtool && \
   apt-get autoremove -y --purge && \
   apt-get clean -y && \
   rm -rf /var/lib/apt/lists/*
 
-USER nonroot
-ENV HOME /home/nonroot
-ENV USER nonroot
-WORKDIR /home/nonroot/workdir
+USER root
+ENV HOME /home/fsf
+ENV USER root
+WORKDIR /home/fsf/
 
-ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/nonroot/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /usr/share/logstash/bin/logstash -f /home/nonroot/fsf/logstash/logstash.conf && /bin/bash
+ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /usr/share/logstash/bin/logstash -f /home/fsf/logstash/logstash.conf && /bin/bash
