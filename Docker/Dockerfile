@@ -74,6 +74,7 @@ RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | apt-key add 
 RUN apt-get install apt-transport-https
 RUN echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | tee -a /etc/apt/sources.list.d/elastic-7.x.list
 RUN apt-get update && apt-get install logstash
+RUN /usr/share/logstash/bin/logstash-plugin install logstash-output-amazon_es
 
 # Retrieve current version of Yara via wget, verify known good hash and install Yara
 RUN cd /tmp && \
@@ -150,7 +151,7 @@ USER root
 RUN cd /home/ && \
   mkdir fsf-logs && \
   git clone https://github.com/abhinavbom/fsf.git && \
-  cd fsf/ && \
+  cd fsf/
 
 USER root
 RUN ldconfig && \
@@ -166,4 +167,4 @@ ENV HOME /home/fsf
 ENV USER root
 WORKDIR /home/fsf/
 
-ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /usr/share/logstash/bin/logstash -f /home/fsf/logstash/logstash.conf && /bin/bash
+ENTRYPOINT sed -i "/^SERVER_CONFIG/ s/0\.0\.0\.0/$(hostname -i)/" /home/fsf/fsf-client/conf/config.py && main.py start && printf "\n\n" && echo "<----->" && echo "FSF server daemonized!" &&  echo "<----->" && printf "\n" && echo "Invoke fsf_client.py by giving it a file as an argument:" && printf "\n" && echo "fsf_client.py <file>"  && printf "\n" && echo "Alternatively, Invoke fsf_client.py by giving it a file as an argument and pass to jq so you can interact extensively with the JSON output:" && printf "\n" && echo "fsf_client.py <file> | jq -C . | less -r" && printf "\n" && echo "To access all of the subobjects that are recursively processed, simply add --full when invoking fsf_client.py:" && printf "\n" && echo "fsf_client.py <file> --full" && printf "\n" && /usr/share/logstash/bin/logstash -f /home/fsf/fsf-server/logstash/logstash.conf && /bin/bash
